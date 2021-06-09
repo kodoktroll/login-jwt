@@ -1,0 +1,27 @@
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
+[entryPoints]
+    [entryPoints.http]
+        address = ":80"
+    [entryPoints.https]
+        address = ":443"
+
+[api]
+    dashboard = true
+[http]
+    [http.routers]
+        [http.routers.to-login]
+            rule = "PathPrefix(`/api/login`) || PathPrefix(`/api/logout`) || PathPrefix(`/api/signup`) || PathPrefix(`/api/token/refresh`)"
+            service = "login"
+        [http.routers.to-profile]
+            rule = "PathPrefix(`/api/profile`)"
+            service = "profile"
+    [http.services]
+        [http.services.login.loadBalancer]
+            [[http.services.login.loadBalancer.servers]]
+                url = "http://login:8000/"
+                port = "8000"
+        [http.services.profile.loadBalancer]
+            [[http.services.profile.loadBalancer.servers]]
+                url = "http://profile:8001/"
+                port = "8001"
